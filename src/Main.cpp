@@ -1,23 +1,31 @@
 #include <Arduino.h>
-#include <ESP8266WiFi.h>
+#include "dht_sensor.h"
 #include <WiFiConnector.h>
-#include <ESP8266HTTPClient.h>
 
-#include "dht11.h"
-
-//#define DHT_TYPE DHT11
-#define DHT_PIN 5
 #define SECONDS 1000
 
-#ifndef SSID
-  #define SSID "esp8266"
-  #define PASS "8D5Y9MD306L"
+#ifndef WIFI_SSID
+  #define WIFI_SSID "esp8266"
+  #define WIFI_PASS "8D5Y9MD306L"
 #endif
 
-WiFiConnector wifi(SSID, PASS);
+WiFiConnector wifi(WIFI_SSID, WIFI_PASS);
+//WifiController mWifi;
+DHT mDHT11;
+int temperature;
+int humidity;
+bool initialised = false;
 
-void setupWifi() {
-  Serial.println("Setup wifi");
+void setupVar() {
+  Serial.println("setupVar");
+  mDHT11 = DHT();
+  WiFi.disconnect(true);
+  temperature = -1;
+  humidity = -1;
+  initialised = true;
+}
+
+void init_wifi() {
   wifi.init();
   wifi.on_connected([&](const void* message)
   {
@@ -29,42 +37,45 @@ void setupWifi() {
   {
     Serial.print("Connecting to ");
     Serial.println(wifi.get("ssid") + ", " + wifi.get("password"));
-    delay(5*SECONDS);
+    delay(200);
   });
-}
-
-void getTempData() {
-  dht11 m_dht;
-  int chk = m_dht.read(DHT_PIN);
-  if (chk == 0) {
-    Serial.print("The humidity is: ");
-    Serial.println(m_dht.humidity);
-    Serial.print("The temperature is ");
-    Serial.println(m_dht.temperature);
-  }
-  else {
-    Serial.print("Error reading DHT11: ");
-    Serial.println(chk);
-  }
 }
 
 void setup() {
   Serial.begin(9600);
-  delay(2*SECONDS);
-  Serial.println("ESP8266 setup");
-  wifi.disconnect(true);
-  delay(1*SECONDS);
-  Serial.println("will be started in 10s...");
-  setupWifi();
+  delay(5*SECONDS);
+  if (!initialised) {
+    setupVar();
+    init_wifi();
+    wifi.connect();
+  }
+  Serial.println("Main setup");
+}
+
+int readDHT11() {
+  if (mDHT11.getData() == 0) {
+    temperature = mDHT11.getHumidity();
+    humidity = mDHT11.getTemperature();
+    return 0;
+  }
+  return -1;
 }
 
 void loop() {
-  wifi.loop();
-  if (!wifi.connected()) {
-    Serial.println("Wifit not connected");
-    wifi.connect();
+  Serial.println("Main loop");
+  if (initialised) {
+    mDHT11.loop();
+    wifi.loop();
+    if (readDHT11() == 0) {
+      Serial.print("Temperature: ");
+      Serial.println(temperature);
+      Serial.print("Humidity: ");
+      Serial.println(humidity);
+    }
   }
-  getTempData();
-  delay(5*SECONDS);
+  else {
+    Serial.println("Setup not initialised");
+  }
+  delay(10*SECONDS);
 
 }
