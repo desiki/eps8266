@@ -8,11 +8,12 @@
 class WifiManager
 {
 private:
-  bool mConnected;
-public:
+  char *mSsid;
+  char *mPass;
 
+public:
   WifiManager();
-  WifiManager(const char* ssid, const char* password);
+  WifiManager(char* ssid, char* password);
   bool isConnected();
   void loop();
   void connect();

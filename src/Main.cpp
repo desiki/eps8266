@@ -13,7 +13,6 @@ DHT mDHT11;
 WifiManager mWifi;
 int temperature;
 int humidity;
-bool initialised = false;
 
 void setupVar() {
   Serial.println("setupVar");
@@ -21,15 +20,12 @@ void setupVar() {
   mDHT11 = DHT();
   temperature = -1;
   humidity = -1;
-  initialised = true;
 }
 
 void setup() {
   Serial.begin(9600);
   delay(5*SECONDS);
-  if (!initialised) {
-    setupVar();
-  }
+  setupVar();
   Serial.println("Main setup");
 }
 
@@ -44,18 +40,15 @@ int readDHT11() {
 
 void loop() {
   Serial.println("Main loop");
-  if (initialised) {
-    if (readDHT11() == 0) {
-      Serial.print("Temperature: ");
-      Serial.println(temperature);
-      Serial.print("Humidity: ");
-      Serial.println(humidity);
-    }
-    mWifi.loop();
+  if (readDHT11() == 0) {
+    Serial.print("Temperature: ");
+    Serial.println(temperature);
+    Serial.print("Humidity: ");
+    Serial.println(humidity);
   }
-  else {
-    Serial.println("Setup not initialised");
+  if (!mWifi.isConnected()) {
+    Serial.println("Wifi is disconnected");
+    mWifi.connect();
   }
-  delay(10*SECONDS);
-
+  mWifi.loop();
 }
