@@ -50,5 +50,7 @@ void loop() {
     Serial.println("Wifi is disconnected");
     mWifi.connect();
   }
-  mWifi.loop();
+  delay(10*SECONDS);
+  Serial.println("Go to sleep");
+  //ESP.deepSleep(5 * 1000000);
 }
