@@ -16,6 +16,7 @@ public:
   soilSensor(int vcc_pin, int soil_pin);
   soilSensor();
   void setPins(int vcc_pin, int soil_pin);
+  bool readData();
   float readValuePer(); //  Returns the value in percentage
   int readAbsoluteValue(); // Returns the complete value
 

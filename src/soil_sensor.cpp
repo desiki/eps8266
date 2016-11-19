@@ -18,6 +18,15 @@ void soilSensor::setPins(int vcc_pin, int soil_pin)
   soilPin = soil_pin;
 }
 
+bool soilSensor::readData()
+{
+  digitalWrite(vccPin, HIGH);
+  delay(0.05*1000);
+  lastReadedValue = analogRead(soilPin);
+  digitalWrite(vccPin, LOW);
+  return true; //TODO: needs some checks
+}
+
 float soilSensor::readValuePer()
 {
   return ((float)readAbsoluteValue()/1024)*100;
@@ -25,9 +34,5 @@ float soilSensor::readValuePer()
 
 int soilSensor::readAbsoluteValue()
 {
-  digitalWrite(vccPin, HIGH);
-  delay(0.05*1000);
-  lastReadedValue = analogRead(soilPin);
-  digitalWrite(vccPin, LOW);
   return lastReadedValue;
 }

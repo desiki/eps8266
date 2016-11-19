@@ -16,44 +16,24 @@ DHT mDHT11 = DHT();
 WifiManager mWifi = WifiManager(WIFI_SSID, WIFI_PASS);
 soilSensor mSoil = soilSensor(SOIL_VCC_PIN, SOIL_PIN);
 
-int temperature = -1;
-int humidity = -1;
-float soilHumidity = 0.0;
-
 void setup() {
   Serial.begin(9600);
   delay(2*SECONDS);
 }
 
-int readDHT11() {
-  if (mDHT11.getData() == 0) {
-    humidity  = mDHT11.getHumidity();
-    temperature = mDHT11.getTemperature();
-    return 0;
-  }
-  return -1;
-}
-
-bool readSoilSensor()
-{
-
-  return true;
-}
-
 void loop() {
   Serial.println("Main loop");
-  if (readDHT11() == 0)
+  if (mDHT11.getData() == 0)
   {
     Serial.print("Temperature: ");
-    Serial.println(temperature);
+    Serial.println(mDHT11.getTemperature());
     Serial.print("Humidity: ");
-    Serial.println(humidity);
+    Serial.println(mDHT11.getHumidity());
   }
-  if (readSoilSensor())
+  if (mSoil.readData())
   {
-    soilHumidity = mSoil.readValuePer();
     Serial.print("Soil moisture is: ");
-    Serial.print(soilHumidity);
+    Serial.print(mSoil.readValuePer());
     Serial.println("%");
   }
   if (!mWifi.isConnected())
