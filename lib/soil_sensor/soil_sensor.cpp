@@ -20,17 +20,10 @@ void soilSensor::setPins(int vcc_pin, int soil_pin)
 
 bool soilSensor::readData()
 {
-  Serial.println("soilSensor::readData()");
   digitalWrite(vccPin, HIGH);
-  pinMode(soilPin,INPUT);
-  delay(0.1*1000);
-  lastReadedValue = analogRead(soilPin);
-  delay(0.1*1000);
-  lastReadedValue = constrain(lastReadedValue, 300 , 1023);
-  Serial.println("lastReadedValue = " + lastReadedValue);
-  digitalWrite(vccPin, LOW);
-  Serial.println("soilSensor::readData() finished");
-  return true; //TODO: needs some checks
+  delay(10000);
+  lastReadedValue = analogRead(A0);
+  return true; // todo: add checks
 }
 
 float soilSensor::readValuePer()

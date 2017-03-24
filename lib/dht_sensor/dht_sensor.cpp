@@ -33,5 +33,4 @@ int DHT::getTemperature() {
 }
 
 void DHT::loop(){
-
 }
